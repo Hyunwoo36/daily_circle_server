@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Test Signup Page</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>Sign Up</h1>
+    <form action="http://localhost:3000/auth/signup" method="post">
+        <h1>Username:</h1>
+        <input type="text" name="username" required />
+        <h1>Password:</h1>
+        <input type="password" name="password" required />
+
+        <input type="submit" value="Sign Up" />
+
+    </form>
+
+    <p>Already have an account?<a href="login.html">Login</a></p>
+
+</body>
+
+<script>
+    document.getElementById('signupForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const formData = {
+            username: this.username.value,
+            password: this.password.value
+        };
+
+        fetch('/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect to the login page
+                    window.location.href = '/login.html';
+                } else {
+                    // Handle signup failure (e.g., show an error message)
+                    console.error('Signup failed:', data.errorMessage);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    });
+</script>

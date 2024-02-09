@@ -1,0 +1,19 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+form {
+    background: #fff;
+    border-width: 1px;
+    border-color: black;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.flexRow {
+    display: flex;
+    flex-direction: row;
+}

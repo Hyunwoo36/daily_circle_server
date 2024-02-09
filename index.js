@@ -1,8 +1,9 @@
 import 'dotenv/config';
 import express from 'express';
-import { pool } from './src/data/postgresDB.js';
+
 import userRouter from './src/controller/users.js';
 import recordRouter from './src/controller/records.js';
+import authRouter from './src/auth/authorization.js';
 
 
 const app = express();
@@ -17,6 +18,7 @@ app.get('/', (req, res) => {
 
 app.use('/users', userRouter);
 app.use('/record', recordRouter);
+app.use('/auth', authRouter);
 
 app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`)

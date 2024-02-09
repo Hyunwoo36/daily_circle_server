@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Test Page</title>
+    <link rel="stylesheet" href="style.css"> <!-- Linking CSS file -->
+</head>
+
+<body>
+    <h1>Testing Backend</h1>
+
+    <form action="http://localhost:3000/record/submit" method="post">
+        <h1>Your UID</h1>
+        <input type="text" name="uid" />
+        <div>
+            <h2>Health</h2>
+            <div>
+                <div class="flexRow">
+                    <h3>Sleeping</h3>
+                    <input type="number" name="sleeping" />
+                </div>
+                <div class="flexRow">
+                    <h3>Eating</h3>
+                    <input type="number" name="eating" />
+                </div>
+                <div class="flexRow">
+                    <h3>Workout</h3>
+                    <input type="number" name="workout" />
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h2>Work</h2>
+            <div>
+                <div class="flexRow">
+                    <h3>Coding</h3>
+                    <input type="number" name="coding" />
+                </div>
+                <div class="flexRow">
+                    <h3>Reading</h3>
+                    <input type="number" name="reading" />
+                </div>
+                <div class="flexRow">
+                    <h3>Academic</h3>
+                    <input type="number" name="academic" />
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h2>Relationship</h2>
+            <div>
+                <div class="flexRow">
+                    <h3>Friends</h3>
+                    <input type="number" name="friends" />
+                </div>
+                <div class="flexRow">
+                    <h3>Family</h3>
+                    <input type="number" name="family" />
+                </div>
+                <div class="flexRow">
+                    <h3>Romance</h3>
+                    <input type="number" name="romance" />
+                </div>
+            </div>
+        </div>
+        <input type="submit" value="Submit" />
+    </form>
+    <a href="edit.html">TO Edit PAGE</a>
+
+
+
+</body>
+
+</html>
