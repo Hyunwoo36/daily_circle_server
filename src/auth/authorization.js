@@ -29,10 +29,23 @@ authRouter.post('/login', async (req, res) => {
 
         const userCredential = await signInWithEmailAndPassword(auth, username, password);
         const user = userCredential.user;
-
+        const token = await user.getIdToken();
+        console.log(token);
         res.status(200).json({ success: true, message: 'User logged in Successfully', uid: user.uid });
     } catch (e) {
         res.status(401).json({ message: e.code, errorMessage: e.message });
+    }
+});
+
+/*
+* signout api
+*/
+authRouter.post('/signout', async (req, res) => {
+    try {
+        await signOut(auth);
+        res.send(200).json({ success: true, message: 'user Signed out!' });
+    } catch (e) {
+        res.send(500).json({ message: 'failed to signout', errorMessage: e.message });
     }
 });
 

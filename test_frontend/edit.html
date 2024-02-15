@@ -10,10 +10,14 @@
 
 <body>
     <h1>Testing edit record</h1>
-    <form action="http://localhost:3000/record/edit" method="put">
+    <form action="http://localhost:3000/record/edit" method="post">
 
-        <h1>Your UID</h1>
+        <label>Your UID</label>
         <input type="text" name="uid" />
+
+        <label>Date you want to edit:</label>
+        <input type="date" name="dateToEdit" />
+
         <div>
             <h2>Health</h2>
             <div>
@@ -70,3 +74,29 @@
         <input type="submit" value="EDIT" />
     </form>
 </body>
+
+<script>
+    document.querySelector('form').addEventListener('submit', async function (event) {
+        event.preventDefault(); // prevent from submitting after clicked
+
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+
+        try {
+            const response = await fetch('http://localhost:3000/record/edit', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+            console.log('response: ', response);
+            const resData = await response.json();
+            console.log('Edit Success:', resData);
+        } catch (e) {
+            console.error('Edit Error:', e);
+        }
+    });
+
+</script>

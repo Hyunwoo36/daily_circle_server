@@ -49,8 +49,8 @@ recordRouter.put('/edit', async (req, res) => {
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        const { uid, sleeping, eating, workout, coding, reading, academic, friends, family, romance } = req.body;
-        const date = new Date();
+        const { uid, dateToEdit, sleeping, eating, workout, coding, reading, academic, friends, family, romance } = req.body;
+
         const activities = [
             { category: 'Sleeping', rating: sleeping },
             { category: 'Eating', rating: eating },
@@ -67,8 +67,8 @@ recordRouter.put('/edit', async (req, res) => {
             const result = await client.query(
                 `UPDATE "userRecord"
                 SET rating = $2
-                WHERE date = $4 AND small_category = $3`,
-                [uid, activity.rating, activity.category, date]
+                WHERE uid = $1 AND small_category = $3 AND DATE(date) = $4`,
+                [uid, activity.rating, activity.category, dateToEdit]
             );
             // result.rows contains the rows returned by the query
         }
@@ -77,7 +77,7 @@ recordRouter.put('/edit', async (req, res) => {
 
     } catch (error) {
         await client.query('ROLLBACK');
-        res.status(500).json({ message: "not working" });
+        res.status(500).json({ message: error.message });
 
     } finally {
         client.release();

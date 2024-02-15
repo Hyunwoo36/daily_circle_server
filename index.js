@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 
 import userRouter from './src/controller/users.js';
 import recordRouter from './src/controller/records.js';
@@ -7,6 +8,8 @@ import authRouter from './src/auth/authorization.js';
 
 
 const app = express();
+app.use(cors()); // allow all origins and methods
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for html form post request
 
