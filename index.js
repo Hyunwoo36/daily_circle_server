@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import userRouter from './src/controller/users.js';
 import recordRouter from './src/controller/records.js';
+import summaryRouter from './src/controller/summary.js';
 import authRouter from './src/auth/authorization.js';
 
 
@@ -21,6 +22,7 @@ app.get('/', (req, res) => {
 
 app.use('/users', userRouter);
 app.use('/record', recordRouter);
+app.use('/summary', summaryRouter);
 app.use('/auth', authRouter);
 
 app.listen(PORT, () => {

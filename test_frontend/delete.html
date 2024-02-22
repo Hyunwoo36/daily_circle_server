@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Test DELETE Page</title>
+    <link rel="stylesheet" href="style.css"> <!-- Linking CSS file -->
+</head>
+
+<body>
+    <h1>Testing delete record</h1>
+    <form action="http://localhost:3000/record/delete" method="delete">
+
+        <label>Your UID</label>
+        <input type="text" name="uid" />
+
+        <label>Date you want to delete:</label>
+        <input type="date" name="dateToDelete" />
+        <input type="submit" value="DELETE" />
+    </form>
+</body>
+
+<script>
+    document.querySelector('form').addEventListener('submit', async function (event) {
+        event.preventDefault(); // prevent from submitting after clicked
+
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+
+        try {
+            const response = await fetch('http://localhost:3000/record/delete', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+            console.log('response: ', response);
+            const resData = await response.json();
+            console.log('Delete Success:', resData);
+        } catch (e) {
+            console.error('Delete Error:', e);
+        }
+    });
+
+</script>

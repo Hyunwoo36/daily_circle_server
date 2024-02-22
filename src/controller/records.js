@@ -86,4 +86,33 @@ recordRouter.put('/edit', async (req, res) => {
 
 });
 
+/*
+* delete user's diary
+*/
+recordRouter.delete('/delete', async (req, res) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const { uid, dateToDelete } = req.body; 
+
+        // Delete records for the specified UID and date
+        const result = await client.query(
+            `DELETE FROM "userRecord"
+            WHERE uid = $1 AND DATE(date) = $2`,
+            [uid, dateToDelete]
+        );
+
+        await client.query('COMMIT');
+        res.status(201).json({ message: 'Records deleted successfully' });
+
+    } catch (error) {
+        await client.query('ROLLBACK');
+        res.status(500).json({ message: error.message });
+
+    } finally {
+        client.release();
+    }
+});
+
+
 export default recordRouter;
