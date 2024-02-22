@@ -28,4 +28,4 @@ summaryRouter.get('/summary-weekly', async (req, res) => {
     }
 });
 
-export default recordRouter;
+export default summaryRouter;
