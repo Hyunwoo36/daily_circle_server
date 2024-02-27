@@ -14,7 +14,7 @@ app.use(cors()); // allow all origins and methods
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for html form post request
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 app.get('/', (req, res) => {
     res.send('Hi everyone')
