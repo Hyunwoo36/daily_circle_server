@@ -25,6 +25,6 @@ app.use('/record', recordRouter);
 app.use('/summary', summaryRouter);
 app.use('/auth', authRouter);
 
-app.listen(PORT, () => {
+app.listen(3002, () => {
     console.log(`Server listening at http://localhost:${PORT}`)
 });
