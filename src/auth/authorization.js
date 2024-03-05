@@ -45,9 +45,9 @@ authRouter.post('/login', async (req, res) => {
 authRouter.post('/signout', async (req, res) => {
     try {
         await signOut(auth);
-        res.send(200).json({ success: true, message: 'user Signed out!' });
+        res.status(200).json({ success: true, message: 'user Signed out!' });
     } catch (e) {
-        res.send(500).json({ message: 'failed to signout', errorMessage: e.message });
+        res.status(500).json({ message: 'failed to signout', errorMessage: e.message });
     }
 });
 
