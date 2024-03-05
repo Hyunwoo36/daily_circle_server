@@ -13,7 +13,7 @@ userRouter.get('/', async (req, res) => {
         res.json({ currentTime: rows[0].now }); // Send back the current time as a response
     } catch (err) {
         console.error(err);
-        res.status(500).send('Database connection error');
+        res.status(500).send(`Database connection error: ${err}`);
     }
 });
 
