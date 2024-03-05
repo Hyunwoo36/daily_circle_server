@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "dev2": "pm2 start index.js"
+    "dev2": "pm2 start index.js --name \"daily-circle-server\""
   },
   "author": "",
   "license": "ISC",
