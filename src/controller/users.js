@@ -6,7 +6,7 @@ const userRouter = express.Router();
 /*
 * db connection test api
 */
-userRouter.get('/test-db', async (req, res) => {
+userRouter.get('/', async (req, res) => {
     try {
         const client = await pool.connect();
         const { rows } = await client.query('SELECT NOW()'); // This is a simple query to test the connection
