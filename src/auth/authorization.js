@@ -30,9 +30,13 @@ authRouter.post('/login', async (req, res) => {
         const userCredential = await signInWithEmailAndPassword(auth, username, password);
         const user = userCredential.user;
         const token = await user.getIdToken();
-        console.log(token);
-        res.status(200).json({ success: true, message: 'User logged in Successfully', uid: user.uid });
-        // save token in local storage for 15min and use it as authentication
+
+        res.status(200).json({
+            success: true,
+            message: 'User logged in Successfully',
+            uid: user.uid,
+            token: token
+        });
 
     } catch (e) {
         res.status(401).json({ message: e.code, errorMessage: e.message });

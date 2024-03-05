@@ -4,13 +4,13 @@ import { getAuth } from "firebase/auth";
 
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBXE1JJrnUeE8HdVTo8Kgj9U2h-go58HN8",
-    authDomain: "dailycircle-f157e.firebaseapp.com",
-    projectId: "dailycircle-f157e",
-    storageBucket: "dailycircle-f157e.appspot.com",
-    messagingSenderId: "673993805261",
-    appId: "1:673993805261:web:dbf7cfc8c11da6f26b4884",
-    measurementId: "G-P7Q1E95TXB"
+    apiKey: process.env.FB_APIKEY,
+    authDomain: process.env.FB_AUTHDOMAIN,
+    projectId: process.env.FB_PROJECTID,
+    storageBucket: process.env.FB_STORAGEBUCKET,
+    messagingSenderId: process.env.FB_MESSAGINGSENDERID,
+    appId: process.env.FB_APPID,
+    measurementId: process.env.FB_MEASUREMENTID
 };
 
 const app = initializeApp(firebaseConfig);
