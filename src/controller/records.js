@@ -1,35 +1,53 @@
 import express from "express";
 import { pool } from '../data/postgresDB.js';
+
+
 const recordRouter = express.Router();
+
+
+/*
+* middlewares
+*/
+const verifyToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.sendStatus(401); // if no token, unauthorized
+
+    // Verify the token using Firebase Admin SDK
+    admin.auth().verifyIdToken(token)
+        .then(decodedToken => {
+            const uid = decodedToken.uid;
+            // Attach UID to the request, so it can be used in your route handler
+            req.uid = uid;
+            next();
+        })
+        .catch((error) => {
+            // Handle error
+            console.error('Error verifying auth token', error);
+            res.sendStatus(403); // Forbidden
+        });
+};
 
 /*
 * create User's diary
 */
-recordRouter.post('/submit', async (req, res) => {
+recordRouter.post('/submit', verifyToken, async (req, res) => {
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        const { uid, sleeping, eating, workout, coding, reading, academic, friends, family, romance } = req.body;
+        const categories = req.body;
 
-        const activities = [
-            { category: 'Sleeping', rating: sleeping },
-            { category: 'Eating', rating: eating },
-            { category: 'Workout', rating: workout },
-            { category: 'Coding', rating: coding },
-            { category: 'Reading', rating: reading },
-            { category: 'Academic', rating: academic },
-            { category: 'Friends', rating: friends },
-            { category: 'Family', rating: family },
-            { category: 'Romance', rating: romance },
-        ];
+        for (const category of categories) {
+            for (const activity of category.activities) {
+                const small_category = activity.name.toLowerCase();
+                const rating = activity.score;
+            }
 
-        for (const activity of activities) {
             const result = await client.query(
                 'INSERT INTO "userRecord" (uid, rating, date, small_category) \
                 VALUES ($1, $2, CURRENT_DATE, $3)',
-                [uid, activity.rating, activity.category]
-            );
-            // result.rows contains the rows returned by the query
+                [uid, rating, small_category]
+            )
         }
         await client.query('COMMIT');
         res.status(201).json({ message: 'Records added successfully' });
@@ -93,7 +111,7 @@ recordRouter.delete('/delete', async (req, res) => {
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        const { uid, dateToDelete } = req.body; 
+        const { uid, dateToDelete } = req.body;
 
         // Delete records for the specified UID and date
         const result = await client.query(
