@@ -1,12 +1,13 @@
 import express from "express";
 import { pool } from '../data/postgresDB.js';
+import { admin } from '../auth/firebase.js';
 
 
 const recordRouter = express.Router();
 
 
 /*
-* middlewares
+* middlewares - whenever user do any actions, use this as a middleware
 */
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -19,6 +20,7 @@ const verifyToken = (req, res, next) => {
             const uid = decodedToken.uid;
             // Attach UID to the request, so it can be used in your route handler
             req.uid = uid;
+            console.log(uid);
             next();
         })
         .catch((error) => {
@@ -36,11 +38,14 @@ recordRouter.post('/submit', verifyToken, async (req, res) => {
     try {
         await client.query('BEGIN');
         const categories = req.body;
+        const uid = req.uid;
 
         for (const category of categories) {
+            let small_category;
+            let rating;
             for (const activity of category.activities) {
-                const small_category = activity.name.toLowerCase();
-                const rating = activity.score;
+                small_category = activity.name.toLowerCase();
+                rating = activity.score;
             }
 
             const result = await client.query(
