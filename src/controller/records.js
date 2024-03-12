@@ -20,7 +20,7 @@ const verifyToken = (req, res, next) => {
             const uid = decodedToken.uid;
             // Attach UID to the request, so it can be used in your route handler
             req.uid = uid;
-            console.log(uid);
+            console.log("User verified!");
             next();
         })
         .catch((error) => {
