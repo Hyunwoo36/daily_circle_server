@@ -26,7 +26,7 @@ const verifyToken = (req, res, next) => {
         .catch((error) => {
             // Handle error
             console.error('Error verifying auth token', error);
-            res.sendStatus(403); // Forbidden
+            res.status(403).json({ message: error.message + 'Token is not authorized!' }); // Forbidden
         });
 };
 
