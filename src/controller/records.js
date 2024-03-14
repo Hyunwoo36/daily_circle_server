@@ -13,7 +13,7 @@ recordRouter.post('/submit', verifyToken, async (req, res) => {
     // check the date and if the sent date is today's date, 
     const uid = req.uid;
     const { date, categories } = req.body;
-    console.log('categories:', caetegories);
+    console.log('categories:', categories);
     const submittedDate = new Date(date);
     const today = new Date();
 
