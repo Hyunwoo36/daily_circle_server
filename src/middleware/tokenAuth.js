@@ -1,23 +1,28 @@
-import { admin } from './firebaseAdmin.js'; // Make sure to initialize Firebase Admin SDK
+import { admin } from '../auth/firebase.js';
 
-// Middleware to authenticate and authorize users
-const authenticate = async (req, res, next) => {
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-        const idToken = req.headers.authorization.split('Bearer ')[1];
-        try {
-            const decodedToken = await admin.auth().verifyIdToken(idToken);
-            req.user = decodedToken; // Attach user information to the request
-            next(); // Proceed to the next middleware or request handler
-        } catch (error) {
-            res.status(403).json({ error: 'Unauthorized access, invalid token' });
-        }
-    } else {
-        res.status(403).json({ error: 'Unauthorized access, no token provided' });
-    }
+
+/*
+* middlewares - whenever user do any actions, use this as a middleware
+*/
+const verifyToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.sendStatus(401); // if no token, unauthorized
+
+    // Verify the token using Firebase Admin SDK
+    admin.auth().verifyIdToken(token)
+        .then(decodedToken => {
+            const uid = decodedToken.uid;
+            // Attach UID to the request, so it can be used in your route handler
+            req.uid = uid;
+            console.log("User verified!");
+            next();
+        })
+        .catch((error) => {
+            // Handle error
+            console.error('Error verifying auth token', error);
+            res.status(403).json({ message: error.message + 'Token is not authorized!' }); // Forbidden
+        });
 };
 
-// Usage in an Express route
-app.get('/some-protected-route', authenticate, (req, res) => {
-    // Your route logic here, with access to req.user
-    res.send('Access granted to protected content');
-});
+export default verifyToken;

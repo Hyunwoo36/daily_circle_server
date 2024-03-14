@@ -1,44 +1,30 @@
 import express from "express";
 import { pool } from '../data/postgresDB.js';
-import { admin } from '../auth/firebase.js';
 
+import verifyToken from "../middleware/tokenAuth.js";
 
 const recordRouter = express.Router();
-
-
-/*
-* middlewares - whenever user do any actions, use this as a middleware
-*/
-const verifyToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    if (token == null) return res.sendStatus(401); // if no token, unauthorized
-
-    // Verify the token using Firebase Admin SDK
-    admin.auth().verifyIdToken(token)
-        .then(decodedToken => {
-            const uid = decodedToken.uid;
-            // Attach UID to the request, so it can be used in your route handler
-            req.uid = uid;
-            console.log("User verified!");
-            next();
-        })
-        .catch((error) => {
-            // Handle error
-            console.error('Error verifying auth token', error);
-            res.status(403).json({ message: error.message + 'Token is not authorized!' }); // Forbidden
-        });
-};
 
 /*
 * create User's diary
 */
 recordRouter.post('/submit', verifyToken, async (req, res) => {
+
+    // check the date and if the sent date is today's date, 
+    const uid = req.uid;
+    const { date, categories } = req.body;
+    const submittedDate = new Date(date);
+    const today = new Date();
+
+    // Check if the dates match, reject if from past or future
+    if (submittedDate.toISOString().slice(0, 10) !== today.toISOString().slice(0, 10)) {
+        return res.status(400).json({ message: "You can only submit records for today!" });
+    }
+
     const client = await pool.connect();
+
     try {
         await client.query('BEGIN');
-        const categories = req.body;
-        const uid = req.uid;
 
         for (const category of categories) {
             let small_category;
@@ -46,14 +32,28 @@ recordRouter.post('/submit', verifyToken, async (req, res) => {
             for (const activity of category.activities) {
                 small_category = activity.name.toLowerCase();
                 rating = activity.score;
+
+                // Check if records for the user and date already exist
+                const updateResult = await client.query(
+                    `UPDATE "userRecord"
+                     SET rating = $2
+                     WHERE uid = $1 AND small_category = $3 AND DATE(date) = CURRENT_DATE
+                     RETURNING *`,
+                    [uid, rating, small_category]
+                );
+
+                // If no record was updated (i.e., it did not exist), insert a new one
+                if (updateResult.rowCount === 0) {
+                    await client.query(
+                        'INSERT INTO "userRecord" (uid, rating, date, small_category) \
+                        VALUES ($1, $2, CURRENT_DATE, $3)',
+                        [uid, rating, small_category]
+                    );
+                }
             }
 
-            const result = await client.query(
-                'INSERT INTO "userRecord" (uid, rating, date, small_category) \
-                VALUES ($1, $2, CURRENT_DATE, $3)',
-                [uid, rating, small_category]
-            )
         }
+
         await client.query('COMMIT');
         res.status(201).json({ message: 'Records added successfully' });
     } catch (error) {
@@ -68,46 +68,46 @@ recordRouter.post('/submit', verifyToken, async (req, res) => {
 /*
 * edit user's diary
 */
-recordRouter.put('/edit', async (req, res) => {
-    const client = await pool.connect();
-    try {
-        await client.query('BEGIN');
-        const { uid, dateToEdit, sleeping, eating, workout, coding, reading, academic, friends, family, romance } = req.body;
+// recordRouter.put('/edit', async (req, res) => {
+//     const client = await pool.connect();
+//     try {
+//         await client.query('BEGIN');
+//         const { uid, dateToEdit, sleeping, eating, workout, coding, reading, academic, friends, family, romance } = req.body;
 
-        const activities = [
-            { category: 'Sleeping', rating: sleeping },
-            { category: 'Eating', rating: eating },
-            { category: 'Workout', rating: workout },
-            { category: 'Coding', rating: coding },
-            { category: 'Reading', rating: reading },
-            { category: 'Academic', rating: academic },
-            { category: 'Friends', rating: friends },
-            { category: 'Family', rating: family },
-            { category: 'Romance', rating: romance },
-        ];
+//         const activities = [
+//             { category: 'Sleeping', rating: sleeping },
+//             { category: 'Eating', rating: eating },
+//             { category: 'Workout', rating: workout },
+//             { category: 'Coding', rating: coding },
+//             { category: 'Reading', rating: reading },
+//             { category: 'Academic', rating: academic },
+//             { category: 'Friends', rating: friends },
+//             { category: 'Family', rating: family },
+//             { category: 'Romance', rating: romance },
+//         ];
 
-        for (const activity of activities) {
-            const result = await client.query(
-                `UPDATE "userRecord"
-                SET rating = $2
-                WHERE uid = $1 AND small_category = $3 AND DATE(date) = $4`,
-                [uid, activity.rating, activity.category, dateToEdit]
-            );
-            // result.rows contains the rows returned by the query
-        }
-        await client.query('COMMIT');
-        res.status(201).json({ message: 'Records edited successfully' });
+//         for (const activity of activities) {
+//             const result = await client.query(
+//                 `UPDATE "userRecord"
+//                 SET rating = $2
+//                 WHERE uid = $1 AND small_category = $3 AND DATE(date) = $4`,
+//                 [uid, activity.rating, activity.category, dateToEdit]
+//             );
+//             // result.rows contains the rows returned by the query
+//         }
+//         await client.query('COMMIT');
+//         res.status(201).json({ message: 'Records edited successfully' });
 
-    } catch (error) {
-        await client.query('ROLLBACK');
-        res.status(500).json({ message: error.message });
+//     } catch (error) {
+//         await client.query('ROLLBACK');
+//         res.status(500).json({ message: error.message });
 
-    } finally {
-        client.release();
-    }
+//     } finally {
+//         client.release();
+//     }
 
 
-});
+// });
 
 /*
 * delete user's diary
